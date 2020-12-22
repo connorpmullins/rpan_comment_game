@@ -1,6 +1,4 @@
 const rp = require("request-promise");
-const $ = require("cheerio");
-const WebSocketClient = require("websocket").client;
 
 const VALID_MESSAGES = [
   "red",
@@ -10,27 +8,29 @@ const VALID_MESSAGES = [
 ];
 
 class RPANChat {
-  constructor({ streamID, userAgent }) {
-    this.websocket = new WebSocketClient();
-    this.options = {
-      uri: `https://strapi.reddit.com/videos/t3_${streamID}`,
-      headers: { "User-Agent": userAgent },
-    };
+  constructor({ onConnect, streamID }) {
+    this.uri = `https://strapi.reddit.com/videos/t3_${streamID}`;
+    this.onConnect = onConnect;
+    this.websocket = null;
+    this.failedConnectionAttempts = 0;
+    this.websocketReadyState = 3; // 1:open, 3:closed, 0:connecting  https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
     this.comments = [];
 
-    this.whenConnected = this.whenConnected.bind(this);
+    this.clearComments = this.clearComments.bind(this);
     this.getComments = this.getComments.bind(this);
-
-    this.websocket.on("connect", this.whenConnected);
+    this.onMessage = this.onMessage.bind(this);
   }
 
-  whenConnected(connection) {
-    connection.on("message", (msg) => {
-      const message = JSON.parse(msg.utf8Data);
+  onMessage(msg) {
+      const message = JSON.parse(msg.data);
       if (message.type === "new_comment") {
         let payload = message.payload;
+        
+        // FAKE COMMENT
         const num = Math.floor(Math.random() * Math.floor(4));
         const body = VALID_MESSAGES[num];
+        // 
+        
         let comment = {
           author: payload.author,
           body: body, //payload.body.toLowerCase().trim(),
@@ -44,7 +44,6 @@ class RPANChat {
           }
         }
       }
-    });
   }
 
   clearComments() {
@@ -56,10 +55,21 @@ class RPANChat {
   }
 
   connect() {
-    rp(this.options.uri).then((strapiRequest) => {
+    rp(this.uri).then((strapiRequest) => {
       const streamJSON = JSON.parse(strapiRequest);
       const liveCommentsWebsocket = streamJSON.data.post.liveCommentsWebsocket;
-      this.websocket.connect(liveCommentsWebsocket, null, this.headers);
+      this.websocket = new WebSocket(liveCommentsWebsocket);
+      this.websocket.onmessage = this.onMessage;
+      this.websocket.onopen = this.onConnect;
+      this.websocketReadyState = this.websocket.readyState;
+    }).catch(err => {
+      console.warn("strapiRequest failed: ", err);
+      if (this.failedConnectionAttempts <= 10) {
+        setTimeout(() => {
+          this.connect();
+          this.failedConnectionAttempts += 1;
+        }, 1000)
+      } 
     });
   }
 
