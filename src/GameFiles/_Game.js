@@ -28,17 +28,16 @@ class Game {
     return this.state.winner;
   }
 
-  resetGame() {
-    this.state = {
-      ...defaultState,
-      teams: { ...defaultState.teams },
-      previousComments: lastGameComments,
-    };
-    console.log("Reseting Game: ", this.state);
-  }
+  // Not being used. Might not be necessary (tracking prev. comments)
+  // resetGame() {
+  //   this.state = {
+  //     ...defaultState,
+  //     teams: { ...defaultState.teams },
+  //     previousComments: lastGameComments,
+  //   };
+  // }
 
   eliminationCheck() {
-    console.log("checking for elimination");
     this.state.eliminated = this.checkForElimination(this.state);
   }
 
@@ -83,7 +82,6 @@ class Game {
     newComments = this.checkForTrolls(newComments);
 
     if (newComments.length !== 0) {
-      console.log("new comments: ", newComments);
       // for all new comments, update team scores && user interface
       this.updateGame(newComments);
 
@@ -95,12 +93,6 @@ class Game {
 
     // remove old comments
     if (this.state.previousComments.length > 30) {
-      console.log(
-        "> 30 COMMENTS. new prevComments: ",
-        this.state.previousComments.slice(
-          this.state.previousComments.length - 30
-        )
-      );
       this.state.previousComments = this.state.previousComments.slice(
         this.state.previousComments.length - 30
       );

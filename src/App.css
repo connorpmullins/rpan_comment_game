@@ -31,3 +31,7 @@
   width: 56vw;
 
 }
+
+.row {
+  flex-direction: row;
+}

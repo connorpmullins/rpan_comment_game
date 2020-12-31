@@ -1,23 +1,12 @@
-import {Component} from "react";
-import './App.css';
+import { Component } from "react";
+import "./App.css";
 
 import RPANChat from "./GameFiles/_Client.js";
-import { CURRENT_GAME_MODE, CURRENT_ROUND, GAME_MODES } from "./GameFiles/gameModes.js";
+import GAME_MODES from "./GameFiles/gameModes.js";
 import Game from "./GameFiles/_Game.js";
-import {
-  DisplayGameOverScreen,
-  DisplayNewGameScreen,
-  UpdateCumulativeScores,
-  UpdateGameDisplay,
-} from "./GameFiles/_InterfaceMethods";
+import { OverviewScreen, GameScreen } from "./screens";
 
-function EndGameUpdate(CurrentGame) {
-  DisplayGameOverScreen({ ...CurrentGame.state });
-  UpdateCumulativeScores(CurrentGame.state.winner);
-}
-
-
-const STREAM_ID = "ki7epx"; // YOUR STREAM ID
+const STREAM_ID = "kiai2w"; // YOUR STREAM ID
 
 class App extends Component {
   constructor() {
@@ -27,47 +16,73 @@ class App extends Component {
     this.executeGameLoop = this.executeGameLoop.bind(this);
     this.activeGameLoop = null;
     this.state = {
+      gameInProgress: false,
       gameMode: 0,
+      gameState: { teams: {} },
+      gamesWon: { red: 0, yellow: 0, green: 0, blue: 0 },
+      previousWinner: "red",
+      round: 1,
     };
 
-    
+    this.GAME_MODE = GAME_MODES(this.state.round)[this.state.gameMode];
     this.CHAT = new RPANChat({
       streamID: STREAM_ID,
-      onConnect: this.startGameLoop
+      onConnect: this.startGameLoop,
     });
-    this.CURRENT_GAME_MODE = 1;
-    this.CURRENT_ROUND = 1;
-
-    this.ACTIVE_GAME = new Game(GAME_MODES[CURRENT_GAME_MODE]);
+    this.ACTIVE_GAME = new Game(this.GAME_MODE);
   }
 
   componentDidMount() {
     this.CHAT.connect();
   }
 
+  gameOver() {
+    const { winner } = this.ACTIVE_GAME.state;
+    const { gameMode, gamesWon, round } = this.state;
+    let nextGameMode, nextRound;
+
+    // Change Game Mode
+    if (gameMode !== GAME_MODES(this.state.round).length - 1) {
+      nextGameMode = gameMode + 1;
+      nextRound = round;
+    } else {
+      nextGameMode = 0;
+      nextRound = round + 1;
+    }
+
+    this.setState({
+      gameInProgress: false,
+      gameMode: nextGameMode,
+      gameState: { teams: {} },
+      gamesWon: { ...gamesWon, [winner]: gamesWon[winner] + 1 },
+      previousWinner: winner,
+      round: nextRound,
+    });
+
+    // After 15s
+    setTimeout(() => {
+      this.startNewGame();
+    }, 15000);
+  }
+
   executeGameLoop() {
-   // If there's no winner, the game is ongoing
+    // If there's no winner, the game is ongoing
     if (this.ACTIVE_GAME && !this.ACTIVE_GAME.getWinner()) {
       // Execute Game Loop
       this.ACTIVE_GAME.loop(this.CHAT.getComments());
-  
-      // Update The User Interface after
-      UpdateGameDisplay(this.ACTIVE_GAME.state);
+      // Update The User Interface (by tracking gameState)
+      this.setState({ gameState: this.ACTIVE_GAME.state });
     } else {
-      // Game is over!
-      EndGameUpdate(this.ACTIVE_GAME);
-      this.ACTIVE_GAME.resetGame();
-      this.startNewGame();
+      this.gameOver();
     }
-  } 
+  }
 
   startGameLoop() {
-    console.log('startingGameLoop');
     // Clear pre-game comments
     this.CHAT.clearComments();
 
     // Reset/Initialize UI (needs game mode uiProps)
-    DisplayNewGameScreen(GAME_MODES[CURRENT_GAME_MODE]);
+    this.setState({ gameInProgress: true });
 
     // Start the GameLoop
     this.activeGameLoop = setInterval(() => {
@@ -79,48 +94,35 @@ class App extends Component {
   }
 
   startNewGame() {
-    // After 100s (decrease to 30)
-    setTimeout(() => {
-      // Change Game Mode
-      if (CURRENT_GAME_MODE !== GAME_MODES.length - 1) {
-        CURRENT_GAME_MODE += 1;
-      } else {
-        // If we've gone through all modes, increment round, reset mode
-        CURRENT_GAME_MODE = 0;
-        // eslint-disable-next-line no-unused-vars
-        CURRENT_ROUND += 1;
-      }
-  
-      this.startGameLoop();
-    }, 30000);
+    const {gameMode, round} = this.state;
+    this.GAME_MODE = GAME_MODES(round)[gameMode];
+    console.log(
+      "starting new game. round: ",
+      round,
+      "game mode: ",
+      gameMode,
+      " game mode: ",
+      this.GAME_MODE
+    );
+    this.ACTIVE_GAME = new Game(this.GAME_MODE);
+    this.startGameLoop();
   }
 
   render() {
     return (
       <div className="App">
-      <div className="Page-wrapper">
-        <p className="App-header">
-          <p>
-            GAME UPDATES
-          </p>
-        </p>
-        <p className="App-body">
-          <p>
-            {this.ACTIVE_GAME.state.winner}
-          </p>
-          <p>
-            {Object.keys(this.ACTIVE_GAME.state.teams).map(team => (
-              <p><p>{team}</p><p>{this.ACTIVE_GAME.state.teams[team]}</p></p>
-            ))}
-          </p>
-          <p>
-            {this.ACTIVE_GAME.state.eliminated}
-          </p>
-          <p>
-            {this.ACTIVE_GAME.state.eliminated}
-          </p>
-        </p>
-      </div>
+        <div className="Page-wrapper">
+          {this.state.gameInProgress ? (
+            <GameScreen gameState={this.state.gameState} gameInfo={this.GAME_MODE.uiProps}/>
+          ) : (
+            <OverviewScreen
+              previousWinner={this.state.previousWinner}
+              totalWins={this.state.gamesWon}
+              round={this.state.round}
+              gameMode={this.state.gameMode}
+            />
+          )}
+        </div>
       </div>
     );
   }
