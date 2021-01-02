@@ -6,7 +6,7 @@ import GAME_MODES from "./GameFiles/gameModes.js";
 import Game from "./GameFiles/_Game.js";
 import { OverviewScreen, GameScreen } from "./screens";
 
-const STREAM_ID = "kp04or"; // YOUR STREAM ID
+const STREAM_ID = "kp25ax"; // YOUR STREAM ID
 
 class App extends Component {
   constructor() {
@@ -17,10 +17,10 @@ class App extends Component {
     this.activeGameLoop = null;
     this.state = {
       gameInProgress: false,
-      gameMode: 1,
+      gameMode: 0,
       gameState: { teams: {} },
       gamesWon: { red: 0, yellow: 0, green: 0, blue: 0 },
-      previousWinner: "red",
+      previousWinner: "",
       round: 1,
     };
 
@@ -119,7 +119,7 @@ class App extends Component {
               previousWinner={this.state.previousWinner}
               totalWins={this.state.gamesWon}
               round={this.state.round}
-              gameMode={this.state.gameMode}
+              gameMode={this.GAME_MODE.uiProps.title}
             />
           )}
         </div>

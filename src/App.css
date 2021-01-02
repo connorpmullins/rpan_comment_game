@@ -50,6 +50,27 @@ body, html {
   text-overflow: wrap;
 }
 
+/* OVERVIEW STYLES */
+
+.Overview-card {
+  border: 2px solid white;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  text-align: left;
+  padding: 10px;
+}
+
+.Overview-info {
+  margin-bottom: 10px;
+}
+
+
+/* GAME STYLES */
+
 .Game-info {
   margin-bottom: 10px;
 }
