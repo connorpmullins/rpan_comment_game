@@ -10,6 +10,7 @@ const GAME_MODES = round => ([
     uiProps: {
       title: "FIRST TO THE FINISH LINE",
       description: `The first team to reach ${10 * round} votes wins!`,
+      target: 10 * round
     },
   },
   {
@@ -31,6 +32,7 @@ const GAME_MODES = round => ([
     uiProps: {
       title: "STAY ALIVE!!",
       description: `The Last Team to recieve ${10 * round} votes wins!`,
+      target: 10 * round
     },
   },
   // {

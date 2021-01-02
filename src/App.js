@@ -6,7 +6,7 @@ import GAME_MODES from "./GameFiles/gameModes.js";
 import Game from "./GameFiles/_Game.js";
 import { OverviewScreen, GameScreen } from "./screens";
 
-const STREAM_ID = "kiai2w"; // YOUR STREAM ID
+const STREAM_ID = "kp04or"; // YOUR STREAM ID
 
 class App extends Component {
   constructor() {
@@ -17,7 +17,7 @@ class App extends Component {
     this.activeGameLoop = null;
     this.state = {
       gameInProgress: false,
-      gameMode: 0,
+      gameMode: 1,
       gameState: { teams: {} },
       gamesWon: { red: 0, yellow: 0, green: 0, blue: 0 },
       previousWinner: "red",
