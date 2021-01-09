@@ -26,14 +26,14 @@ class RPANChat {
       if (message.type === "new_comment") {
         let payload = message.payload;
         
-        // FAKE COMMENT
+        // FAKE A VALID COMMENT
         const num = Math.floor(Math.random() * Math.floor(4));
         const body = VALID_MESSAGES[num];
-        // 
+        // use 'body' for comment.body
         
         let comment = {
           author: payload.author,
-          body: body, //payload.body.toLowerCase().trim(),
+          body: body, // payload.body.toLowerCase().trim(),
           id: payload._id36,
         };
         // Filter invalid messages

@@ -6,7 +6,7 @@ import GAME_MODES from "./GameFiles/gameModes.js";
 import Game from "./GameFiles/_Game.js";
 import { OverviewScreen, GameScreen } from "./screens";
 
-const STREAM_ID = "kp25ax"; // YOUR STREAM ID
+const STREAM_ID = "ksr3r5"; // YOUR STREAM ID
 
 class App extends Component {
   constructor() {

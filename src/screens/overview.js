@@ -17,8 +17,8 @@ const OverviewScreen = ({ gameMode, previousWinner, round, totalWins }) => (
     {Boolean(previousWinner) && (
       <Card title="Previous Game">
         <Info title="Winner: ">{previousWinner.toUpperCase()}</Info>
-        <Info title="MVPs: ">
-          TO-DO (display MVP for each team or overall MVP)
+        <Info title="To-Do: ">
+          display MVP for each team or overall MVP
         </Info>
       </Card>
     )}
@@ -47,11 +47,6 @@ const OverviewScreen = ({ gameMode, previousWinner, round, totalWins }) => (
       <br/>
       <Info title="Code: ">
         https://github.com/connorpmullins/rpan_comment_game
-      </Info>
-      <br/>
-      <Info title="P.S. ">
-        I'm looking for a React/React Native developer role in the Bay Area if 
-        your team is hiring: connorpmullins@gmail.com
       </Info>
     </Card>
   </div>

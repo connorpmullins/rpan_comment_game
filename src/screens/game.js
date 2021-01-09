@@ -14,9 +14,16 @@ const GameScreen = ({
 }) => (
   <div>
     <div className="Game-header">
-      <div className="Game-info"> <strong>Game Mode: </strong> {title}  </div>
-      <div className="Game-info"> <strong>Description: </strong> {description} </div>
-      <div className="Game-info"> <strong>How to play: </strong> Comment 'red', 'green', 'blue', or 'yellow' to cast a vote </div>
+      <div className="Game-info">
+        <strong>Game Mode: </strong> {title}
+      </div>
+      <div className="Game-info">
+        <strong>Description: </strong> {description}
+      </div>
+      <div className="Game-info">
+        <strong>How to play: </strong> Comment red, green, blue, or yellow to
+        cast a vote
+      </div>
     </div>
     <div className="App-body">
       {Boolean(eliminated && eliminated.length) && (
@@ -40,6 +47,7 @@ const GameScreen = ({
                 </div>
               </div>
               <img src={snoos[team]} alt="team mascot" className="Mascot" />
+              <span>{team}</span>
             </div>
           );
         })}
